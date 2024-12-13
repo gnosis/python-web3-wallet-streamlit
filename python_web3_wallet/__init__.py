@@ -1,10 +1,6 @@
 import os
 import streamlit.components.v1 as components
 
-# Create a _RELEASE constant. We'll set this to False while we're developing
-# the component, and True when we're ready to package and distribute it.
-# (This is, of course, optional - there are innumerable ways to manage your
-# release process.)
 _RELEASE = True
 
 # Declare a Streamlit component. `declare_component` returns a function
@@ -43,7 +39,7 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def my_component(recipient: str, value_in_ether: str, key=None):
+def my_component(recipient: str, amount_in_ether: str, key=None):
     """Create a new instance of "my_component".
 
     Parameters
@@ -51,27 +47,13 @@ def my_component(recipient: str, value_in_ether: str, key=None):
     recipient: str
         The name of the thing we're saying hello to. The component will display
         the text "Hello, {name}!"
-    value: str or None
-        An optional key that uniquely identifies this component. If this is
-        None, and the component's arguments are changed, the component will
-        be re-mounted in the Streamlit frontend and lose its current state.
-
-    Returns
-    -------
-    int
-        The number of times the component's "Click Me" button has been clicked.
-        (This is the value passed to `Streamlit.setComponentValue` on the
-        frontend.)
+    amount_in_ether: str
+        Amount in ether to be transferred.
 
     """
     # Call through to our private component function. Arguments we pass here
     # will be sent to the frontend, where they'll be available in an "args"
     # dictionary.
     #
-    # "default" is a special argument that specifies the initial return
-    # value of the component before the user has interacted with it.
-    component_value = _component_func(recipient=recipient,  valueInEther=value_in_ether, key=key)
-
-    # We could modify the value returned from the component if we wanted.
-    # There's no need to do this in our simple example - but it's an option.
+    component_value = _component_func(recipient=recipient,  amountInEther=amount_in_ether, key=key)
     return component_value

@@ -15,7 +15,7 @@ import { useAccount, useSendTransaction } from "wagmi";
  * Streamlit library. Your custom args can be accessed via the `args` props.
  */
 function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactElement {
-  const { recipient, valueInEther } = args;
+  const { recipient, amountInEther } = args;
 
 
   const { sendTransaction } = useSendTransaction();
@@ -53,7 +53,7 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
         onClick={() =>
           sendTransaction({
             to: getAddress(recipient),
-            value: parseEther(valueInEther),
+            value: parseEther(amountInEther),
           })
         }
         disabled={!account.isConnected}

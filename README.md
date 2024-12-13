@@ -15,5 +15,5 @@ import streamlit as st
 
 from python_web3_wallet import my_component
 
-c = my_component() # Displays RainbowKit wallet
+c = my_component(recipient="0x...", amount_in_ether="0.01") # Displays RainbowKit wallet
 ```
