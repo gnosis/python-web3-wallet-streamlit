@@ -1,4 +1,7 @@
 **/*/node_modules
 **/*/build
 **/*/dist
+dist/
+build/
 .env
+*.egg-info
