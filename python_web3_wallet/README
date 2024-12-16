@@ -1,0 +1,17 @@
+## Testing the app
+
+Run [app.py](app.py) with Streamlit - edit [PythonWeb3Wallet](frontend/src/PythonWeb3Wallet.tsx) and [__init__.py](__init__.py) if required.
+
+## Publishing
+
+```
+# build
+python setup.py sdist bdist_wheel   
+```
+
+```
+# publish on testpy
+python -m twine upload --repository testpypi dist/* --verbose
+# upload to pypi
+python -m twine upload dist/* --verbose 
+```
