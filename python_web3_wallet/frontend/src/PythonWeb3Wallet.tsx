@@ -3,19 +3,18 @@ import {
   withStreamlitConnection,
   ComponentProps,
 } from "streamlit-component-lib";
-import { getAddress, parseEther } from 'viem';
+import { type Hex, getAddress, parseEther } from 'viem';
 import React, { useCallback, useEffect, useMemo, useState, ReactElement } from "react"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import '@rainbow-me/rainbowkit/styles.css';
 import { useAccount, useSendTransaction } from "wagmi";
-
 
 /**
  * This is a React-based component template. The passed props are coming from the 
  * Streamlit library. Your custom args can be accessed via the `args` props.
  */
 function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactElement {
-  const { recipient, amountInEther } = args;
+  const { recipient, amountInEther, data } = args;
 
 
   const { sendTransaction } = useSendTransaction();
@@ -54,6 +53,7 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
           sendTransaction({
             to: getAddress(recipient),
             value: parseEther(amountInEther),
+            data: data as Hex
           })
         }
         disabled={!account.isConnected}

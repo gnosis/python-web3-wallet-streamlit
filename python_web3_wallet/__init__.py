@@ -39,7 +39,7 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def my_component(recipient: str, amount_in_ether: str, key=None):
+def my_component(recipient: str, amount_in_ether: str, data: str, key=None):
     """Create a new instance of "my_component".
 
     Parameters
@@ -49,11 +49,13 @@ def my_component(recipient: str, amount_in_ether: str, key=None):
         the text "Hello, {name}!"
     amount_in_ether: str
         Amount in ether to be transferred.
+    data: str
+        Hexadecimal-formatted string that will be used to fill the data field of the transaction.
 
     """
     # Call through to our private component function. Arguments we pass here
     # will be sent to the frontend, where they'll be available in an "args"
     # dictionary.
     #
-    component_value = _component_func(recipient=recipient,  amountInEther=amount_in_ether, key=key)
+    component_value = _component_func(recipient=recipient,  amountInEther=amount_in_ether,data=data, key=key)
     return component_value

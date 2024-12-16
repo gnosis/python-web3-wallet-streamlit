@@ -7,7 +7,7 @@ Streamlit component that allows you to connect a wallet and trigger send transac
 ```sh
 pip install web3-wallet-connect
 ```
-tex 
+ 
 ## Usage instructions
 
 ```python
