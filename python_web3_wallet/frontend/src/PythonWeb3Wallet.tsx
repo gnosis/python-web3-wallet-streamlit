@@ -3,14 +3,13 @@ import {
   withStreamlitConnection,
   ComponentProps,
 } from "streamlit-component-lib";
-import { type Hex, formatEther, formatGwei, formatUnits, getAddress, parseEther } from 'viem';
-import React, { useCallback, useEffect, useMemo, useState, ReactElement } from "react"
+import { type Hex, getAddress, parseEther } from 'viem';
+import React, { useEffect, useMemo, useState, ReactElement } from "react"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import '@rainbow-me/rainbowkit/styles.css';
-import { useAccount, useSendTransaction, useWriteContract, useChainId, useContractWrite, useWaitForTransactionReceipt, BaseError } from "wagmi";
+import { useAccount, useSendTransaction, useWriteContract, useChainId, useWaitForTransactionReceipt, BaseError } from "wagmi";
 import { abi } from './abi';
-import { stringToHex } from 'viem';
-import { waitForTransactionReceipt } from "viem/actions";
+import { AGENT_COMMUNICATION_CONTRACT } from "./constants";
 /**
  * This is a React-based component template. The passed props are coming from the 
  * Streamlit library. Your custom args can be accessed via the `args` props.
@@ -18,19 +17,14 @@ import { waitForTransactionReceipt } from "viem/actions";
 function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactElement {
   const { recipient, amountInEther, data } = args;
 
-
-  const { sendTransaction } = useSendTransaction();
   const {
     data: hash,
     error,
-    isPending,
-    writeContract
+    writeContractAsync
   } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({
-      hash,
-    });
-  const chainId = useChainId();
+  // useWaitForTransactionReceipt({
+  //   hash,
+  // });
   const account = useAccount();
 
   const [isFocused, setIsFocused] = useState(false)
@@ -51,24 +45,27 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
   }, [style, theme]);
 
 
-  const d = () => {
-    console.log('entered d');
-    console.log('data', data as Hex);
-    writeContract({
-      abi,
-      address: getAddress('0xd422e0059ed819e8d792af936da206878188e34f'),
-      functionName: 'sendMessage',
-      args: [
-        getAddress(recipient),
-        data as Hex,
-      ],
-      value: parseEther(amountInEther),
-    });
+  const sendMessage = async () => {
+    console.log(`sending message with content ${data as Hex} to ${recipient}`);
 
-    console.log('executed tx hash', hash);
+    try {
+      const txHash = await writeContractAsync({
+        abi,
+        address: AGENT_COMMUNICATION_CONTRACT,
+        functionName: 'sendMessage',
+        args: [
+          getAddress(recipient),
+          data as Hex,
+        ],
+        value: parseEther(amountInEther),
+      }, {
+        onError: (err) => console.log(err),
+      });
+      console.log(`txHash ${txHash}`);
+    } catch {
+      // We simply pass here since errors already logged.
+    }
 
-
-    console.log('confirmed tx', isConfirmed);
 
   };
 
@@ -81,32 +78,17 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
           backgroundColor: !account.isConnected ? 'gray' : 'blue',
           color: 'white',
           padding: '15px 30px',
+          marginBottom: '15px',
           fontSize: '18px',
           border: 'none',
           borderRadius: '10px',
         }}
-        onClick={() =>
-          sendTransaction({
-            to: getAddress(recipient),
-            value: parseEther(amountInEther),
-            data: data as Hex
-          })
-        }
+        onClick={(sendMessage)}
         disabled={!account.isConnected}
       >
-        Send transaction
+        Send transaction to agent
       </button>
-      <button
-        onClick={d}
-      >
-        Transfer123
-      </button>
-      <p>chainId {chainId}</p>
-      <p>amountInEther {amountInEther}</p>
-      <p>pending {isPending}</p>
-      {hash && <div>Transaction Hash: {hash}</div>}
-      {isConfirming && <div>Waiting for confirmation...</div>}
-      {isConfirmed && <div>Transaction confirmed.</div>}
+
       {error && (
         <div>Error: {(error as BaseError).shortMessage || error.message}</div>
       )}
