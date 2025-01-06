@@ -22,9 +22,7 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
     error,
     writeContractAsync
   } = useWriteContract();
-  // useWaitForTransactionReceipt({
-  //   hash,
-  // });
+
   const account = useAccount();
 
   const [isFocused, setIsFocused] = useState(false)
