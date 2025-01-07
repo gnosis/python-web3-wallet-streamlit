@@ -5,8 +5,8 @@ on:
   push:
     branches:
       - gabriel/poetry
-  release:
-    types: [ published ]
+  #release:
+  #  types: [ published ]
 
 jobs:
   publish-pypi-package:
