@@ -2,6 +2,9 @@ name: Python CD
 
 on:
   pull_request:
+  push:
+    branches:
+      - gabriel/poetry
   release:
     types: [ published ]
 
