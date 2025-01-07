@@ -84,7 +84,7 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
         onClick={(sendMessage)}
         disabled={!account.isConnected}
       >
-        Send transaction to agent
+        Send message to agent
       </button>
 
       {error && (
