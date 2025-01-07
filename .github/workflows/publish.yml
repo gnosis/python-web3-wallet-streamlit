@@ -21,6 +21,10 @@ jobs:
       #- name: Verify the tag version in the pyproject.toml
       #  run: grep -q "version = \"${{ github.event.release.tag_name }}\"" pyproject.toml || exit 1
       #  shell: bash
+      - name: Set Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
       - uses: ./.github/actions/python_prepare
       - name: Build Frontend
         run: npm run build --prefix python_web3_wallet/frontend
