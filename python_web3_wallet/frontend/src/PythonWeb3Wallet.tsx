@@ -4,11 +4,12 @@ import {
   ComponentProps,
 } from "streamlit-component-lib";
 import { type Hex, getAddress, parseEther } from 'viem';
-import React, { useCallback, useEffect, useMemo, useState, ReactElement } from "react"
+import React, { useEffect, useMemo, useState, ReactElement } from "react"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import '@rainbow-me/rainbowkit/styles.css';
-import { useAccount, useSendTransaction } from "wagmi";
-
+import { useAccount, useSendTransaction, useWriteContract, useChainId, useWaitForTransactionReceipt, BaseError } from "wagmi";
+import { abi } from './abi';
+import { AGENT_COMMUNICATION_CONTRACT } from "./constants";
 /**
  * This is a React-based component template. The passed props are coming from the 
  * Streamlit library. Your custom args can be accessed via the `args` props.
@@ -16,8 +17,12 @@ import { useAccount, useSendTransaction } from "wagmi";
 function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactElement {
   const { recipient, amountInEther, data } = args;
 
+  const {
+    data: hash,
+    error,
+    writeContractAsync
+  } = useWriteContract();
 
-  const { sendTransaction } = useSendTransaction();
   const account = useAccount();
 
   const [isFocused, setIsFocused] = useState(false)
@@ -38,6 +43,32 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
   }, [style, theme]);
 
 
+  const sendMessage = async () => {
+    console.log(`sending message with content ${data as Hex} to ${recipient}`);
+
+    try {
+      const txHash = await writeContractAsync({
+        abi,
+        address: AGENT_COMMUNICATION_CONTRACT,
+        functionName: 'sendMessage',
+        args: [
+          getAddress(recipient),
+          data as Hex,
+        ],
+        value: parseEther(amountInEther),
+      }, {
+        onError: (err) => console.log(err),
+      });
+      console.log(`txHash ${txHash}`);
+    } catch {
+      // We simply pass here since errors already logged.
+    }
+
+
+  };
+
+
+
   return (
     <>
       <button
@@ -45,21 +76,22 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
           backgroundColor: !account.isConnected ? 'gray' : 'blue',
           color: 'white',
           padding: '15px 30px',
+          marginBottom: '15px',
           fontSize: '18px',
           border: 'none',
           borderRadius: '10px',
         }}
-        onClick={() =>
-          sendTransaction({
-            to: getAddress(recipient),
-            value: parseEther(amountInEther),
-            data: data as Hex
-          })
-        }
+        onClick={(sendMessage)}
         disabled={!account.isConnected}
       >
-        Send transaction
+        Send message to agent
       </button>
+
+      {error && (
+        <div>Error: {(error as BaseError).shortMessage || error.message}</div>
+      )}
+
+
       <div
         style={{
           paddingBottom: '500px'

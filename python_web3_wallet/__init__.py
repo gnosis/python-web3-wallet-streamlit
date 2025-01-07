@@ -39,7 +39,7 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def my_component(recipient: str, amount_in_ether: str, data: str, key=None):
+def wallet_component(recipient: str, amount_in_ether: str, data: str | None = None, key=None):
     """Create a new instance of "my_component".
 
     Parameters

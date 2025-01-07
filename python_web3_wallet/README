@@ -13,5 +13,5 @@ python setup.py sdist bdist_wheel
 # publish on testpy
 python -m twine upload --repository testpypi dist/* --verbose
 # upload to pypi
-python -m twine upload dist/* --verbose 
+python -m twine upload dist/* --verbose
 ```
