@@ -6,7 +6,7 @@ Run [app.py](app.py) with Streamlit - edit [PythonWeb3Wallet](frontend/src/Pytho
 
 1. Build frontend
 ```
-npm build --prefix python_web3_wallet/frontend
+npm run build --prefix python_web3_wallet/frontend
 ```
 
 2. Build python wheel
