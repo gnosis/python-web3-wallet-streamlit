@@ -15,4 +15,4 @@ runs:
       run: poetry install
     - name: Install frontend dependencies
       shell: bash
-      run: yarn install --cwd python_web3_wallet/frontend
+      run: yarn install --cwd python_web3_wallet/frontend --immutable
