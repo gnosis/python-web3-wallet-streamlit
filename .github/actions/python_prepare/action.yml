@@ -10,6 +10,9 @@ runs:
     - name: Install Poetry
       shell: bash
       run: curl -sSL https://install.python-poetry.org | python3 -
-    - name: Install dependencies
+    - name: Install Python dependencies
       shell: bash
       run: poetry install
+    - name: Install frontend dependencies
+      shell: bash
+      run: npm install --prefix python_web3_wallet/frontend
