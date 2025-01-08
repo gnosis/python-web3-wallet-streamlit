@@ -8,7 +8,7 @@ on:
     types: [ published ]
 
 jobs:
-  publish-pypi-package:
+  build:
     #if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
@@ -29,8 +29,39 @@ jobs:
       - uses: ./.github/actions/python_prepare
       - name: Build Frontend
         env:
-          CI: false
+          CI: false # needed otherwise dependencies warnings stop the job
         run: yarn --cwd python_web3_wallet/frontend build
-      - name: Build and Publish
-        run: poetry publish -p ${{ secrets.PYPI_TOKEN }} -u "__token__" --build --repository testpypi # ToDo change to Pypi
-        shell: bash
+      - name: Build a binary wheel and a source tarball
+        run: poetry build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      # - name: Build and Publish
+      #   run: poetry publish -p ${{ secrets.PYPI_TOKEN }} -u "__token__" --repository testpypi # ToDo change to Pypi
+      #   shell: bash
+
+publish-to-testpypi:
+    name: Publish to TestPyPI
+    needs:
+    - build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/python-web3-wallet
+
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v4
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution to TestPyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        repository-url: https://test.pypi.org/legacy/
