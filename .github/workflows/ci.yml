@@ -7,26 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/python_prepare
-
-  build_python:
-    runs-on: ubuntu-latest
-    needs:
-      - prepare
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/python_prepare
-      - name: Run poetry build
-        run: poetry build -f wheel
-
   build_frontend:
     runs-on: ubuntu-latest
-    needs:
-      - prepare
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/python_prepare
@@ -34,3 +16,23 @@ jobs:
         env:
           CI: false # needed otherwise dependencies warnings stop the job
         run: yarn --cwd python_web3_wallet/frontend build
+      - name: Cache frontend build
+        uses: actions/cache@v3
+        with:
+          path: python_web3_wallet/frontend/build
+          key: frontend-build-${{ github.sha }}
+
+  build_python:
+    needs: [build_frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/python_prepare
+      - name: Restore frontend build
+        uses: actions/cache@v3
+        with:
+          path: python_web3_wallet/frontend/build
+          key: frontend-build-${{ github.sha }}
+          fail-on-cache-miss: true
+      - name: Run poetry build
+        run: poetry build -f wheel
