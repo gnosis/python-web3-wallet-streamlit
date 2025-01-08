@@ -29,7 +29,6 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
       hash
     });
 
-  // Use useEffect to call dummy when isConfirmed changes to true
   useEffect(() => {
     if (isConfirmed) {
       console.log('tx confirmed');
