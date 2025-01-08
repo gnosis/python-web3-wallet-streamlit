@@ -11,30 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.10"
-      - name: Load cached Poetry installation
-        uses: actions/cache@v3
-        with:
-          path: ~/.local
-          key: poetry-${{ runner.os }}
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-      - name: Cache node_modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            python_web3_wallet/frontend/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('python_web3_wallet/frontend/yarn.lock') }}
       - uses: ./.github/actions/python_prepare
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
 
   build_python:
     runs-on: ubuntu-latest
@@ -42,23 +19,9 @@ jobs:
       - prepare
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: "3.10"
-      - name: Restore Poetry installation
-        uses: actions/cache@v3
-        with:
-          path: ~/.local
-          key: poetry-${{ runner.os }}
-      - name: Restore Poetry dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+      - uses: ./.github/actions/python_prepare
       - name: Run poetry build
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          poetry build -f wheel
+        run: poetry build -f wheel
 
   build_frontend:
     runs-on: ubuntu-latest
@@ -66,16 +29,7 @@ jobs:
       - prepare
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      - name: Restore node_modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            python_web3_wallet/frontend/node_modules
-            ~/.cache/yarn
-          key: ${{ runner.os }}-yarn-${{ hashFiles('python_web3_wallet/frontend/yarn.lock') }}
+      - uses: ./.github/actions/python_prepare
       - name: Build Frontend
         env:
           CI: false # needed otherwise dependencies warnings stop the job
