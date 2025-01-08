@@ -1,13 +1,13 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import '@rainbow-me/rainbowkit/styles.css';
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import {
+  ComponentProps,
   Streamlit,
   withStreamlitConnection,
-  ComponentProps,
 } from "streamlit-component-lib";
 import { type Hex, getAddress, parseEther } from 'viem';
-import React, { useEffect, useMemo, useState, ReactElement } from "react"
-import { ConnectButton } from "@rainbow-me/rainbowkit"
-import '@rainbow-me/rainbowkit/styles.css';
-import { useAccount, useSendTransaction, useWriteContract, useChainId, useWaitForTransactionReceipt, BaseError } from "wagmi";
+import { BaseError, useAccount, useWriteContract } from "wagmi";
 import { abi } from './abi';
 import { AGENT_COMMUNICATION_CONTRACT } from "./constants";
 /**

@@ -28,7 +28,9 @@ jobs:
           cache: 'yarn'
       - uses: ./.github/actions/python_prepare
       - name: Build Frontend
-        run: npm run build --prefix python_web3_wallet/frontend
+        env:
+          CI: false
+        run: yarn --cwd python_web3_wallet/frontend build
       - name: Build and Publish
-        run: poetry publish -p ${{ secrets.PYPI_TOKEN }} -u "__token__" --build
+        run: poetry publish -p ${{ secrets.PYPI_TOKEN }} -u "__token__" --build --repository testpypi # ToDo change to Pypi
         shell: bash
