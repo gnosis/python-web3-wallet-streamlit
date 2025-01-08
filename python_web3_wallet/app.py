@@ -11,4 +11,5 @@ component = components.declare_component("python_web3_wallet", url="http://local
 
 import streamlit as st
 st.title('My title')
-c = component(recipient="0x07354C0aD12741E8F222eB439cFf4c01716cA627", amountInEther="0.00001", data='0x48656c6c6f20776f726c64')
+window_close = component(recipient="0x07354C0aD12741E8F222eB439cFf4c01716cA627", amountInEther="0.00001", data='0x78dacb48cdc9c95728cf2fca4901001a0b045d')
+st.write(f"window close {window_close}")
