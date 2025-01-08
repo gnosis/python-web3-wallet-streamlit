@@ -1,15 +1,13 @@
 name: Python CD
 
 on:
-  push:
-    branches:
-      - gabriel/poetry
+  pull_request:
   release:
     types: [ published ]
 
 jobs:
   build:
-    #if: github.event_name == 'release'
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,9 +16,9 @@ jobs:
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      #- name: Verify the tag version in the pyproject.toml
-      #  run: grep -q "version = \"${{ github.event.release.tag_name }}\"" pyproject.toml || exit 1
-      #  shell: bash
+      - name: Verify the tag version in the pyproject.toml
+        run: grep -q "version = \"${{ github.event.release.tag_name }}\"" pyproject.toml || exit 1
+        shell: bash
       - name: Set Node.js 20.x
         uses: actions/setup-node@v4
         with:
@@ -38,19 +36,15 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-      # - name: Build and Publish
-      #   run: poetry publish -p ${{ secrets.PYPI_TOKEN }} -u "__token__" --repository testpypi # ToDo change to Pypi
-      #   shell: bash
 
-  publish-to-testpypi:
-      name: Publish to TestPyPI
+  publish-to-pypi:
+      name: Publish to PyPI
       needs:
       - build
       runs-on: ubuntu-latest
-
       environment:
-        name: testpypi
-        url: https://test.pypi.org/p/python-web3-wallet
+        name: pypi
+        url: https://pypi.org/p/python-web3-wallet
 
       permissions:
         id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -61,11 +55,10 @@ jobs:
         with:
           name: python-package-distributions
           path: dist/
-      - name: Publish distribution to TestPyPI
+      - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.PYPI_TOKEN }}
-          repository-url: https://test.pypi.org/legacy/
           verify-metadata: false
           verbose: true

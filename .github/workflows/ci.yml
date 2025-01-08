@@ -1,0 +1,34 @@
+name: Python + frontend CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/python_prepare
+
+  build_python:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    steps:
+      - name: Run poetry build
+        run: poetry build -f wheel
+
+  build_frontend:
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+    steps:
+      - name: Build Frontend
+        env:
+          CI: false # needed otherwise dependencies warnings stop the job
+        run: yarn --cwd python_web3_wallet/frontend build
