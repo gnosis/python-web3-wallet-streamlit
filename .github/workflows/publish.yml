@@ -17,6 +17,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify the tag version in the pyproject.toml
+        if: github.event_name == 'release'
         run: grep -q "version = \"${{ github.event.release.tag_name }}\"" pyproject.toml || exit 1
         shell: bash
       - name: Set Node.js 20.x
