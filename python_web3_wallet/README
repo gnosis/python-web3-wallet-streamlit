@@ -16,4 +16,3 @@ poetry publish -p {PYPI_TEST_TOKEN} -u "__token__" --build --repository testpypi
 # upload to pypi
 poetry publish -p {PYPI_TOKEN} -u "__token__" --build
 ```
-

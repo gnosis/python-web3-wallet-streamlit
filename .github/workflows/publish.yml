@@ -64,6 +64,9 @@ jobs:
           verbose: true
 
   publish-dev-package:
+    name: Publish dev package
+    needs:
+      - build
     if: contains(github.event.pull_request.body, 'deploy please') && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment:
