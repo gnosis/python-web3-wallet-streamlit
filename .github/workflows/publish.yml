@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || (contains(github.event.pull_request.body, 'deploy please') && github.event_name == 'pull_request')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -62,3 +62,26 @@ jobs:
           password: ${{ secrets.PYPI_TOKEN }}
           verify-metadata: false
           verbose: true
+
+  publish-dev-package:
+    if: contains(github.event.pull_request.body, 'deploy please') && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+        name: pypi
+        url: https://pypi.org/p/python-web3-wallet
+    permissions:
+        id-token: write  # IMPORTANT: mandatory for trusted publishing
+    steps:
+    - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+    - name: Set Development Version
+      run: |
+        current_version=$(poetry version -s)
+        poetry version "${current_version}.dev${{ github.run_number }}"
+      shell: bash
+    - name: Build and Publish Development Package
+      run: poetry publish -p ${{ secrets.PYPI_TOKEN }} -u "__token__" --build
+      shell: bash
