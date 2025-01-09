@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name == 'release' || (contains(github.event.pull_request.body, 'deploy please') && github.event_name == 'pull_request')
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -17,7 +17,6 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Verify the tag version in the pyproject.toml
-        if: github.event_name == 'release'
         run: grep -q "version = \"${{ github.event.release.tag_name }}\"" pyproject.toml || exit 1
         shell: bash
       - name: Set Node.js 20.x
@@ -63,29 +62,3 @@ jobs:
           password: ${{ secrets.PYPI_TOKEN }}
           verify-metadata: false
           verbose: true
-
-  publish-dev-package:
-    name: Publish dev package
-    needs:
-      - build
-    if: contains(github.event.pull_request.body, 'deploy please') && github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    environment:
-        name: pypi
-        url: https://pypi.org/p/python-web3-wallet
-    permissions:
-        id-token: write  # IMPORTANT: mandatory for trusted publishing
-    steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v4
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Set Development Version
-      run: |
-        current_version=$(poetry version -s)
-        poetry version "${current_version}.dev${{ github.run_number }}"
-      shell: bash
-    - name: Build and Publish Development Package
-      run: poetry publish -p ${{ secrets.PYPI_TOKEN }} -u "__token__" --build
-      shell: bash
