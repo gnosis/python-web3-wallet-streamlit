@@ -1,15 +1,16 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import '@rainbow-me/rainbowkit/styles.css';
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import {
+  ComponentProps,
   Streamlit,
   withStreamlitConnection,
-  ComponentProps,
 } from "streamlit-component-lib";
 import { type Hex, getAddress, parseEther } from 'viem';
-import React, { useEffect, useMemo, useState, ReactElement } from "react"
-import { ConnectButton } from "@rainbow-me/rainbowkit"
-import '@rainbow-me/rainbowkit/styles.css';
-import { useAccount, useSendTransaction, useWriteContract, useChainId, useWaitForTransactionReceipt, BaseError } from "wagmi";
+import { BaseError, useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { abi } from './abi';
 import { AGENT_COMMUNICATION_CONTRACT } from "./constants";
+import { waitForTransactionReceipt } from "viem/actions";
 /**
  * This is a React-based component template. The passed props are coming from the 
  * Streamlit library. Your custom args can be accessed via the `args` props.
@@ -20,12 +21,24 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
   const {
     data: hash,
     error,
+    isPending,
     writeContractAsync
   } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({
+      hash
+    });
+
+  useEffect(() => {
+    if (isConfirmed) {
+      console.log('tx confirmed');
+      Streamlit.setComponentValue(isConfirmed);
+    }
+  }, [isConfirmed]);
 
   const account = useAccount();
 
-  const [isFocused, setIsFocused] = useState(false)
+  const [isFocused, setIsFocused] = useState(false);
 
   const style: React.CSSProperties = useMemo(() => {
     if (!theme) return {}
@@ -59,6 +72,7 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
       }, {
         onError: (err) => console.log(err),
       });
+
       console.log(`txHash ${txHash}`);
     } catch {
       // We simply pass here since errors already logged.
@@ -68,12 +82,13 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
   };
 
 
+  const isButtonDisabled = isPending || !account.isConnected;
 
   return (
     <>
       <button
         style={{
-          backgroundColor: !account.isConnected ? 'gray' : 'blue',
+          backgroundColor: isButtonDisabled ? 'gray' : 'blue',
           color: 'white',
           padding: '15px 30px',
           marginBottom: '15px',
@@ -82,10 +97,13 @@ function PythonWeb3Wallet({ args, disabled, theme }: ComponentProps): ReactEleme
           borderRadius: '10px',
         }}
         onClick={(sendMessage)}
-        disabled={!account.isConnected}
+        disabled={isButtonDisabled}
       >
         Send message to agent
       </button>
+
+      {isConfirming && <div>Waiting for confirmation...</div>}
+      {isConfirmed && <div>Transaction confirmed.</div>}
 
       {error && (
         <div>Error: {(error as BaseError).shortMessage || error.message}</div>

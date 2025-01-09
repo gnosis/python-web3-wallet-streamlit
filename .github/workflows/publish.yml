@@ -1,0 +1,64 @@
+name: Python CD
+
+on:
+  pull_request:
+  release:
+    types: [ published ]
+
+jobs:
+  build:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify the tag version in the pyproject.toml
+        run: grep -q "version = \"${{ github.event.release.tag_name }}\"" pyproject.toml || exit 1
+        shell: bash
+      - name: Set Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+      - uses: ./.github/actions/python_prepare
+      - name: Build Frontend
+        env:
+          CI: false # needed otherwise dependencies warnings stop the job
+        run: yarn --cwd python_web3_wallet/frontend build
+      - name: Build a binary wheel and a source tarball
+        run: poetry build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+  publish-to-pypi:
+      name: Publish to PyPI
+      needs:
+      - build
+      runs-on: ubuntu-latest
+      environment:
+        name: pypi
+        url: https://pypi.org/p/python-web3-wallet
+
+      permissions:
+        id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+      steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}
+          verify-metadata: false
+          verbose: true

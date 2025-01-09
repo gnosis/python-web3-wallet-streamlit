@@ -9,12 +9,10 @@ Run [app.py](app.py) with Streamlit - edit [PythonWeb3Wallet](frontend/src/Pytho
 npm run build --prefix python_web3_wallet/frontend
 ```
 
-2. Build python wheel
-```
-python setup.py sdist bdist_wheel
+2. Publish Python package
 ```
 # publish on testpy
-python -m twine upload --repository testpypi dist/* --verbose
+poetry publish -p {PYPI_TEST_TOKEN} -u "__token__" --build --repository testpypi
 # upload to pypi
-python -m twine upload dist/* --verbose
+poetry publish -p {PYPI_TOKEN} -u "__token__" --build
 ```

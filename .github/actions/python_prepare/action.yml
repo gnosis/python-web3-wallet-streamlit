@@ -1,0 +1,49 @@
+name: "Prepare development environment"
+description: "Set up Python and Node.js environments with caching"
+runs:
+  using: "composite"
+  steps:
+    # Python setup
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.10.14
+    
+    - name: Cache Poetry installation
+      uses: actions/cache@v4
+      with:
+        path: ~/.local
+        key: poetry-${{ runner.os }}
+    
+    - name: Install Poetry
+      shell: bash
+      run: curl -sSL https://install.python-poetry.org | python3 -
+    
+    - name: cache_poetry_dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pypoetry/virtualenvs
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+    
+    - name: Install Python dependencies
+      if: steps.cache_poetry_dependencies.outputs.cache-hit != 'true'
+      shell: bash
+      run: poetry install
+
+    # Node.js setup
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          python_web3_wallet/frontend/node_modules
+          ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('python_web3_wallet/frontend/yarn.lock') }}
+    
+    - name: Install frontend dependencies
+      shell: bash
+      run: yarn install --cwd python_web3_wallet/frontend --immutable

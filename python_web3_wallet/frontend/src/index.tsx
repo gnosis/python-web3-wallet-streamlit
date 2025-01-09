@@ -20,7 +20,7 @@ const queryClient = new QueryClient();
 
 const config = getDefaultConfig({
   appName: 'app',
-  projectId: process.env.REACT_APP_RAINBOW_WALLET_PROJECT_ID!,
+  projectId: process.env.REACT_APP_RAINBOW_PROJECT_ID!,
   chains: [
     gnosis,
     //gnosisFoundryLocalhost
