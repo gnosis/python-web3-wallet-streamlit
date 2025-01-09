@@ -17,7 +17,7 @@ jobs:
           CI: false # needed otherwise dependencies warnings stop the job
         run: yarn --cwd python_web3_wallet/frontend build
       - name: Cache frontend build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: python_web3_wallet/frontend/build
           key: frontend-build-${{ github.sha }}
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/python_prepare
       - name: Restore frontend build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: python_web3_wallet/frontend/build
           key: frontend-build-${{ github.sha }}
