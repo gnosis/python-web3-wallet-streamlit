@@ -22,7 +22,6 @@ jobs:
         with:
           # This part is also where you can pass other options, for example:
           prettier_options: ----check \"src/**/*.ts\"
-          working_directory: python_web3_wallet/frontend
 
 
   build_frontend:
@@ -34,6 +33,7 @@ jobs:
         env:
           CI: false # needed otherwise dependencies warnings stop the job
           REACT_APP_RAINBOW_PROJECT_ID: ${{ secrets.REACT_APP_RAINBOW_PROJECT_ID }}
+          REACT_APP_RPC_URL: ${{ secrets.REACT_APP_RPC_URL }}
         run: yarn --cwd python_web3_wallet/frontend build
       - name: Cache frontend build
         uses: actions/cache@v4
