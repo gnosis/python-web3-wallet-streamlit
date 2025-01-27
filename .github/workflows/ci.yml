@@ -22,7 +22,7 @@ jobs:
         with:
           # This part is also where you can pass other options, for example:
           prettier_options: ----check \"src/**/*.ts\"
-          working_directory: frontend/
+          working_directory: python_web3_wallet/frontend
 
 
   build_frontend:
