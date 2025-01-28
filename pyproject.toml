@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-web3-wallet"
-version = "0.0.15"
+version = "0.0.16"
 description = "Streamlit component that allows users to connect a wallet and send transactions with dynamic recipients and amounts"
 authors = ["Gnosis AI <ai@gnosis.io>"]
 license = "MIT"
